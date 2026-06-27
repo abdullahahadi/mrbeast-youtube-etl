@@ -1,6 +1,8 @@
 import requests
 import os
+import json
 from dotenv import load_dotenv
+from datetime import date
 
 load_dotenv(dotenv_path="./.env")
 API_KEY = os.getenv("API_KEY")
@@ -115,10 +117,19 @@ def extract_video_data(video_ids):
     except requests.exceptions.RequestException as e:
         raise e
 
+def save_to_json(extracted_data):
+    file_path = f"./data/YT_data_{date.today()}.json"
+
+    with open(file_path, "w", encoding="utf-8") as json_output:
+        # converts a Python object into JSON and writes it directly to the file.
+        # indent=4 : Makes the JSON pretty and easier to read.
+        # ensure_ascii=False : This controls how non-ASCII characters are written: ("city": "کابل") not like ("city": "\u06a9\u0627\u0628\u0644")
+        json.dump(extracted_data, json_output, indent=4, ensure_ascii=False)
 
 if __name__ == "__main__":
     playlist_id = get_playlist_id()
     video_ids = get_video_ids(playlist_id)
-    extract_video_data(video_ids)
+    video_data = extract_video_data(video_ids)
+    save_to_json(video_data)
 
 
